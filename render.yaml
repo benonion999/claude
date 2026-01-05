@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: stock-picker
+    env: python
+    region: oregon
+    plan: free
+    branch: claude/stock-picker-alerts-H0w6N
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT web_app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0

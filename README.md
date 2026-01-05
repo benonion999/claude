@@ -137,6 +137,23 @@ The application will:
 
 Press `Ctrl+C` to gracefully stop the stock picker in either mode.
 
+## Deployment to Live URL
+
+Want to access your Stock Picker from anywhere? Deploy it to a live URL!
+
+See the complete **[Deployment Guide](DEPLOYMENT.md)** for step-by-step instructions to deploy on:
+- **Render.com** (Recommended - Free tier available)
+- Railway.app
+- Fly.io
+- Heroku
+
+Quick deploy to Render:
+1. Push code to GitHub
+2. Sign up at https://render.com
+3. Create Web Service from your GitHub repo
+4. Use start command: `gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT web_app:app`
+5. Get your live URL in minutes!
+
 ## Understanding the Output
 
 ### Signal Types

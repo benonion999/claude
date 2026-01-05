@@ -255,5 +255,8 @@ def run_web_app(host='0.0.0.0', port=5000, debug=False):
     socketio.run(app, host=host, port=port, debug=debug, allow_unsafe_werkzeug=True)
 
 
+# Load config on module import for production deployment
+load_config()
+
 if __name__ == '__main__':
     run_web_app(debug=True)

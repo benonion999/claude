@@ -1,0 +1,17 @@
+{
+  "stocks": ["ASML", "NVDA", "AMD", "TSMC"],
+  "daily_update_time": "09:00",
+  "check_interval_minutes": 15,
+  "analysis_settings": {
+    "rsi_oversold": 30,
+    "rsi_overbought": 70,
+    "sma_short_period": 20,
+    "sma_long_period": 50,
+    "volume_spike_threshold": 1.5
+  },
+  "notification_settings": {
+    "enable_console": true,
+    "enable_email": false,
+    "email_address": ""
+  }
+}

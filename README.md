@@ -4,12 +4,15 @@ A Python-based stock analysis tool that provides daily insights and real-time bu
 
 ## Features
 
+- **Web Dashboard**: Beautiful, modern web interface with real-time updates
+- **Interactive Charts**: Candlestick charts with technical indicators using Plotly
 - **Daily Insights**: Scheduled daily stock analysis reports at a configured time
 - **Real-time Monitoring**: Continuous monitoring with alerts on signal changes
 - **Technical Analysis**: Uses RSI, SMA, EMA, MACD, and volume analysis
 - **Buy/Sell Recommendations**: Automated recommendations with confidence scores
-- **Configurable**: Easy JSON configuration for stocks, schedule, and analysis parameters
-- **Colored Console Output**: Easy-to-read colored terminal output
+- **Configurable**: Easy web-based settings or JSON configuration
+- **Dual Mode**: Run as web dashboard or console application
+- **WebSocket Updates**: Live updates pushed to dashboard automatically
 
 ## Technical Indicators Used
 
@@ -76,9 +79,49 @@ Edit `config.json` to customize your settings:
 
 ## Usage
 
-### Run the Stock Picker
+Stock Picker can run in two modes: **Web Dashboard** (recommended) or **Console Mode**.
 
-Start the application with scheduled monitoring:
+### Web Dashboard Mode (Recommended)
+
+Start the web-based dashboard:
+
+```bash
+python run.py --mode web
+```
+
+Or simply:
+
+```bash
+python run.py
+```
+
+Then open your browser to: **http://localhost:5000**
+
+#### Web Dashboard Features:
+
+- **Portfolio Overview**: Visual cards showing total stocks, buy/sell/hold signals
+- **Top Recommendations**: Prioritized buy and sell suggestions with confidence scores
+- **Stock Cards**: Interactive cards for each stock with current analysis
+- **Detailed Charts**: Click any stock to view candlestick charts with technical indicators
+- **Real-time Updates**: Live updates via WebSocket (no manual refresh needed)
+- **Settings Page**: Configure stocks and analysis parameters through the web UI
+- **Responsive Design**: Works on desktop, tablet, and mobile devices
+
+#### Custom Host/Port:
+
+```bash
+python run.py --mode web --host 0.0.0.0 --port 8080
+```
+
+### Console Mode
+
+For terminal-based operation with colored text output:
+
+```bash
+python run.py --mode console
+```
+
+Or directly:
 
 ```bash
 python stock_picker.py
@@ -92,7 +135,7 @@ The application will:
 
 ### Stopping the Application
 
-Press `Ctrl+C` to gracefully stop the stock picker.
+Press `Ctrl+C` to gracefully stop the stock picker in either mode.
 
 ## Understanding the Output
 
@@ -150,18 +193,38 @@ ASML
 .
 ├── config.json           # Configuration file
 ├── requirements.txt      # Python dependencies
-├── stock_picker.py       # Main application entry point
-├── stock_fetcher.py      # Stock data fetching module
-├── stock_analyzer.py     # Technical analysis engine
-├── notifier.py          # Notification system
+├── run.py               # Main launcher (web or console mode)
+├── stock_picker.py      # Console application
+├── web_app.py           # Flask web application
+├── stock_fetcher.py     # Stock data fetching module
+├── stock_analyzer.py    # Technical analysis engine
+├── notifier.py          # Notification system (console)
+├── templates/           # HTML templates
+│   ├── index.html       # Main dashboard
+│   └── settings.html    # Settings page
+├── static/              # Static web assets
+│   ├── css/
+│   │   └── style.css    # Custom styling
+│   └── js/
+│       ├── dashboard.js # Dashboard functionality
+│       └── settings.js  # Settings functionality
 └── README.md            # This file
 ```
 
 ## Customization
 
-### Adding More Stocks
+### Using Web Settings (Easy Method)
 
-Edit the `stocks` array in `config.json`:
+1. Navigate to **http://localhost:5000/settings** in your browser
+2. Modify any settings through the user-friendly interface
+3. Click "Save Configuration"
+4. Changes take effect immediately
+
+### Manual Configuration (Advanced)
+
+Edit `config.json` directly:
+
+#### Adding More Stocks
 
 ```json
 {
@@ -169,15 +232,15 @@ Edit the `stocks` array in `config.json`:
 }
 ```
 
-### Adjusting Analysis Parameters
+#### Adjusting Analysis Parameters
 
-Modify `analysis_settings` in `config.json` to tune the sensitivity of signals:
+Modify `analysis_settings` to tune the sensitivity of signals:
 
 - Lower RSI thresholds = more sensitive to overbought/oversold
 - Shorter SMA periods = more responsive to price changes
 - Higher volume threshold = only alert on larger volume spikes
 
-### Changing Schedule
+#### Changing Schedule
 
 - **Daily insights**: Modify `daily_update_time` (e.g., "16:00" for 4 PM)
 - **Real-time checks**: Modify `check_interval_minutes` (e.g., 5 for every 5 minutes)
@@ -214,12 +277,15 @@ Modify `analysis_settings` in `config.json` to tune the sensitivity of signals:
 Potential features for future versions:
 
 - Email/SMS notifications
-- Web dashboard
-- Backtesting capabilities
+- Backtesting capabilities with historical performance metrics
 - Machine learning price predictions
-- Portfolio tracking
-- News sentiment analysis
-- Support for cryptocurrency and forex
+- Portfolio tracking with buy/sell transaction history
+- News sentiment analysis integration
+- Support for cryptocurrency and forex markets
+- Multi-user support with authentication
+- Mobile app (iOS/Android)
+- Webhook notifications for third-party integrations
+- Advanced charting with drawing tools
 
 ## License
 

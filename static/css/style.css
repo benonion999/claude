@@ -1,0 +1,274 @@
+/* Stock Picker Dashboard Styles */
+
+:root {
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --dark-color: #212529;
+    --light-bg: #f8f9fa;
+}
+
+body {
+    background-color: var(--light-bg);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navbar */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+#connection-status {
+    cursor: default;
+}
+
+#status-icon {
+    font-size: 0.6rem;
+    vertical-align: middle;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+    font-weight: 600;
+}
+
+/* Stock Cards */
+.stock-card {
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.stock-card .card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stock-price {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.price-change {
+    font-size: 1rem;
+    margin-left: 10px;
+}
+
+.price-change.positive {
+    color: var(--success-color);
+}
+
+.price-change.negative {
+    color: var(--danger-color);
+}
+
+.signal-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.signal-badge.buy {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.signal-badge.sell {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.signal-badge.hold {
+    background-color: var(--warning-color);
+    color: var(--dark-color);
+}
+
+.confidence-bar {
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.confidence-fill {
+    height: 100%;
+    transition: width 0.5s ease;
+}
+
+.confidence-fill.buy {
+    background-color: var(--success-color);
+}
+
+.confidence-fill.sell {
+    background-color: var(--danger-color);
+}
+
+.confidence-fill.hold {
+    background-color: var(--warning-color);
+}
+
+/* Technical Indicators */
+.indicators {
+    font-size: 0.85rem;
+    margin-top: 10px;
+}
+
+.indicators .indicator {
+    display: inline-block;
+    margin-right: 15px;
+    padding: 4px 8px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.indicator-label {
+    font-weight: 600;
+    color: #6c757d;
+}
+
+/* Analysis Reasons */
+.analysis-reasons {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #dee2e6;
+}
+
+.analysis-reasons ul {
+    margin-bottom: 0;
+    padding-left: 20px;
+}
+
+.analysis-reasons li {
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+/* Recommendations */
+.recommendation-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-left: 4px solid;
+    background-color: rgba(0, 0, 0, 0.02);
+    border-radius: 4px;
+}
+
+.recommendation-item.buy {
+    border-color: var(--success-color);
+}
+
+.recommendation-item.sell {
+    border-color: var(--danger-color);
+}
+
+.recommendation-item .symbol {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.recommendation-item .confidence {
+    float: right;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Loading Spinner */
+.spinner-container {
+    text-align: center;
+    padding: 40px;
+}
+
+/* Modal */
+.modal-xl {
+    max-width: 1200px;
+}
+
+#stock-chart {
+    min-height: 400px;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+#refresh-btn {
+    padding: 10px 24px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stock-price {
+        font-size: 1.5rem;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+    }
+
+    .indicators .indicator {
+        display: block;
+        margin-bottom: 5px;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease;
+}
+
+/* Connection Status */
+.status-connected {
+    color: var(--success-color) !important;
+}
+
+.status-disconnected {
+    color: var(--danger-color) !important;
+}
+
+/* Overview Cards */
+#overview-cards .card {
+    margin-bottom: 20px;
+}
+
+#overview-cards h2 {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+#overview-cards .card-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}

@@ -28,17 +28,54 @@ latest_analyses = []
 alert_history = []
 
 
+def get_default_config():
+    """Get default configuration"""
+    return {
+        "stocks": ["ASML", "NVDA", "AMD", "TSMC"],
+        "daily_update_time": "09:00",
+        "check_interval_minutes": 15,
+        "analysis_settings": {
+            "rsi_oversold": 30,
+            "rsi_overbought": 70,
+            "sma_short_period": 20,
+            "sma_long_period": 50,
+            "volume_spike_threshold": 1.5
+        },
+        "notification_settings": {
+            "enable_console": True,
+            "enable_email": False,
+            "email_address": ""
+        }
+    }
+
+
 def load_config():
-    """Load configuration from file"""
+    """Load configuration from file or use defaults"""
     global config, fetcher, analyzer
     try:
         with open('config.json', 'r') as f:
             config = json.load(f)
+            print("Loaded configuration from config.json")
+    except FileNotFoundError:
+        print("config.json not found, using default configuration")
+        config = get_default_config()
+        # Try to save default config
+        try:
+            with open('config.json', 'w') as f:
+                json.dump(config, f, indent=2)
+                print("Created config.json with default settings")
+        except Exception as e:
+            print(f"Could not create config.json: {e} (continuing with defaults)")
+    except Exception as e:
+        print(f"Error loading config: {e}, using defaults")
+        config = get_default_config()
+
+    try:
         fetcher = StockDataFetcher()
         analyzer = StockAnalyzer(config['analysis_settings'])
         return True
     except Exception as e:
-        print(f"Error loading config: {e}")
+        print(f"Error initializing fetcher/analyzer: {e}")
         return False
 
 
@@ -57,6 +94,12 @@ def save_config():
 def index():
     """Render main dashboard"""
     return render_template('index.html')
+
+
+@app.route('/health')
+def health():
+    """Health check endpoint for deployment platforms"""
+    return jsonify({'status': 'healthy', 'service': 'stock-picker'}), 200
 
 
 @app.route('/settings')

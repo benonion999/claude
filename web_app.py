@@ -9,6 +9,7 @@ from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 
 from stock_fetcher import StockDataFetcher
+from alpha_vantage_fetcher import AlphaVantageStockFetcher
 from stock_analyzer import StockAnalyzer
 from notifier import Notifier
 import plotly.graph_objs as go
@@ -23,6 +24,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # Global state
 config = {}
 fetcher = None
+av_fetcher = None  # Alpha Vantage fallback
 analyzer = None
 latest_analyses = []
 alert_history = []
@@ -51,7 +53,7 @@ def get_default_config():
 
 def load_config():
     """Load configuration from file or use defaults"""
-    global config, fetcher, analyzer
+    global config, fetcher, av_fetcher, analyzer
     try:
         with open('config.json', 'r') as f:
             config = json.load(f)
@@ -72,7 +74,10 @@ def load_config():
 
     try:
         fetcher = StockDataFetcher()
+        # Initialize Alpha Vantage as fallback (using demo key for now)
+        av_fetcher = AlphaVantageStockFetcher(api_key="demo")
         analyzer = StockAnalyzer(config['analysis_settings'])
+        print("Initialized stock fetchers (yfinance + Alpha Vantage fallback)")
         return True
     except Exception as e:
         print(f"Error initializing fetcher/analyzer: {e}")
@@ -185,13 +190,19 @@ def analyze_stocks():
 
         print(f"Analyzing stocks: {stocks}")
         stock_data = fetcher.get_multiple_stocks(stocks, period="3mo")
-        print(f"Fetched data for {len(stock_data)} stocks")
+        print(f"Fetched data for {len(stock_data)} stocks from yfinance")
+
+        # Fallback to Alpha Vantage if yfinance fails
+        if not stock_data and av_fetcher:
+            print("yfinance failed, falling back to Alpha Vantage...")
+            stock_data = av_fetcher.get_multiple_stocks(stocks)
+            print(f"Fetched data for {len(stock_data)} stocks from Alpha Vantage")
 
         if not stock_data:
-            print("No stock data returned from fetcher")
+            print("No stock data returned from any fetcher")
             return jsonify({
                 'success': False,
-                'message': 'Failed to fetch stock data. Please check your internet connection and try again.'
+                'message': 'Failed to fetch stock data from both yfinance and Alpha Vantage. Please try again later.'
             }), 500
 
         analyses = []
@@ -252,8 +263,13 @@ def get_stock_chart(symbol):
         period = request.args.get('period', '1mo')
         data = fetcher.get_stock_data(symbol, period=period)
 
+        # Fallback to Alpha Vantage if yfinance fails
+        if data is None and av_fetcher:
+            print(f"yfinance failed for {symbol}, trying Alpha Vantage...")
+            data = av_fetcher.get_stock_data(symbol)
+
         if data is None:
-            return jsonify({'success': False, 'message': 'No data available'}), 404
+            return jsonify({'success': False, 'message': 'No data available from any source'}), 404
 
         # Calculate indicators
         df = analyzer.calculate_indicators(data)

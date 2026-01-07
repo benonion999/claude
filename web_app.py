@@ -104,23 +104,23 @@ def health():
 
 @app.route('/api/test-yfinance')
 def test_yfinance():
-    """Test if yfinance is working"""
+    """Test if yfinance is working with custom headers"""
     try:
-        print("Testing yfinance with AAPL...")
-        import yfinance as yf
-        stock = yf.Ticker("AAPL")
-        data = stock.history(period="5d")
+        print("Testing yfinance with AAPL using custom headers...")
+        # Use the fetcher's session with headers
+        data = fetcher.get_stock_data("AAPL", period="5d")
 
-        if data.empty:
+        if data is None or data.empty:
             return jsonify({
                 'success': False,
-                'message': 'yfinance returned empty data for AAPL',
-                'rows': 0
+                'message': 'yfinance returned empty data for AAPL even with custom headers',
+                'rows': 0,
+                'note': 'Yahoo Finance may be blocking requests from this server IP'
             }), 500
 
         return jsonify({
             'success': True,
-            'message': 'yfinance is working!',
+            'message': 'yfinance is working with custom headers!',
             'symbol': 'AAPL',
             'rows': len(data),
             'latest_price': float(data['Close'].iloc[-1]),

@@ -272,3 +272,80 @@ body {
     text-transform: uppercase;
     margin-bottom: 10px;
 }
+
+/* Dark Mode */
+[data-theme="dark"] {
+    --light-bg: #1a1d29;
+    --card-bg: #242938;
+    --text-color: #e4e6eb;
+    --text-muted: #b0b3b8;
+    --border-color: #3a3f51;
+}
+
+[data-theme="dark"] body {
+    background-color: var(--light-bg);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .navbar-dark {
+    background-color: #0d1117 !important;
+}
+
+[data-theme="dark"] .card {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .modal-content {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1);
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background-color: #1a1d29;
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    background-color: #1a1d29;
+    color: var(--text-color);
+    border-color: var(--primary-color);
+}
+
+/* Dark Mode Toggle Button */
+#dark-mode-toggle {
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+#dark-mode-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Smooth theme transitions */
+body,
+.card,
+.navbar,
+.form-control,
+.form-select {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}

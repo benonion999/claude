@@ -5,6 +5,7 @@ import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
+import time
 
 
 class StockDataFetcher:
@@ -14,30 +15,45 @@ class StockDataFetcher:
         self.cache = {}
         self.cache_timeout = timedelta(minutes=5)
 
-    def get_stock_data(self, symbol: str, period: str = "1mo", interval: str = "1d") -> Optional[pd.DataFrame]:
+    def get_stock_data(self, symbol: str, period: str = "1mo", interval: str = "1d", retries: int = 3) -> Optional[pd.DataFrame]:
         """
-        Fetch stock data for a given symbol
+        Fetch stock data for a given symbol with retry logic
 
         Args:
             symbol: Stock ticker symbol (e.g., 'ASML')
             period: Data period (1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max)
             interval: Data interval (1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo)
+            retries: Number of retry attempts
 
         Returns:
             DataFrame with stock data or None if fetch fails
         """
-        try:
-            stock = yf.Ticker(symbol)
-            data = stock.history(period=period, interval=interval)
+        for attempt in range(retries):
+            try:
+                print(f"Fetching {symbol} (attempt {attempt + 1}/{retries})...")
+                stock = yf.Ticker(symbol)
+                data = stock.history(period=period, interval=interval)
 
-            if data.empty:
-                print(f"Warning: No data returned for {symbol}")
-                return None
+                if data.empty:
+                    print(f"Warning: No data returned for {symbol}")
+                    if attempt < retries - 1:
+                        time.sleep(1 * (attempt + 1))  # Exponential backoff
+                        continue
+                    return None
 
-            return data
-        except Exception as e:
-            print(f"Error fetching data for {symbol}: {e}")
-            return None
+                print(f"Successfully fetched {len(data)} rows for {symbol}")
+                return data
+            except Exception as e:
+                print(f"Error fetching data for {symbol} (attempt {attempt + 1}): {e}")
+                if attempt < retries - 1:
+                    time.sleep(2 * (attempt + 1))  # Exponential backoff
+                else:
+                    print(f"Failed to fetch {symbol} after {retries} attempts")
+                    import traceback
+                    traceback.print_exc()
+                    return None
+
+        return None
 
     def get_current_price(self, symbol: str) -> Optional[float]:
         """

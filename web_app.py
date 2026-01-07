@@ -102,6 +102,39 @@ def health():
     return jsonify({'status': 'healthy', 'service': 'stock-picker'}), 200
 
 
+@app.route('/api/test-yfinance')
+def test_yfinance():
+    """Test if yfinance is working"""
+    try:
+        print("Testing yfinance with AAPL...")
+        import yfinance as yf
+        stock = yf.Ticker("AAPL")
+        data = stock.history(period="5d")
+
+        if data.empty:
+            return jsonify({
+                'success': False,
+                'message': 'yfinance returned empty data for AAPL',
+                'rows': 0
+            }), 500
+
+        return jsonify({
+            'success': True,
+            'message': 'yfinance is working!',
+            'symbol': 'AAPL',
+            'rows': len(data),
+            'latest_price': float(data['Close'].iloc[-1]),
+            'data_sample': data.tail(2).to_dict()
+        })
+    except Exception as e:
+        import traceback
+        return jsonify({
+            'success': False,
+            'message': str(e),
+            'traceback': traceback.format_exc()
+        }), 500
+
+
 @app.route('/settings')
 def settings():
     """Render settings page"""

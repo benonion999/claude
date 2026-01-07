@@ -349,3 +349,86 @@ body,
 .form-select {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* Skeleton Loading Animation */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+    border-radius: 4px;
+}
+
+[data-theme="dark"] .skeleton {
+    background: linear-gradient(90deg, #2a2d3a 25%, #1f222e 50%, #2a2d3a 75%);
+    background-size: 200% 100%;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton-text {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-title {
+    height: 2rem;
+    width: 60%;
+    margin-bottom: 1rem;
+}
+
+.skeleton-price {
+    height: 3rem;
+    width: 40%;
+    margin-bottom: 1rem;
+}
+
+.skeleton-card {
+    padding: 1.5rem;
+}
+
+.skeleton-indicator {
+    height: 1.5rem;
+    width: 80px;
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+/* Mobile Improvements */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 0.5rem;
+    }
+
+    #refresh-btn {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .stock-card .card-body {
+        padding: 1rem;
+    }
+
+    .stock-price {
+        font-size: 1.3rem !important;
+    }
+
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+
+    #overview-cards h2 {
+        font-size: 2rem !important;
+    }
+
+    .modal-xl {
+        max-width: 95%;
+    }
+}

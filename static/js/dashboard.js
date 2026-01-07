@@ -82,6 +82,37 @@ function updateConnectionStatus(connected) {
     }
 }
 
+// Show skeleton loading screens
+function showSkeletonLoaders() {
+    const container = document.getElementById('stock-cards');
+    const skeletons = Array(4).fill(0).map(() => `
+        <div class="col-md-6 col-lg-4">
+            <div class="card stock-card">
+                <div class="card-body skeleton-card">
+                    <div class="skeleton skeleton-title"></div>
+                    <div class="skeleton skeleton-price"></div>
+                    <div class="skeleton skeleton-text" style="width: 80%;"></div>
+                    <div class="skeleton skeleton-text" style="width: 60%;"></div>
+                    <div class="mt-3">
+                        <div class="skeleton skeleton-indicator"></div>
+                        <div class="skeleton skeleton-indicator"></div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text" style="width: 90%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    container.innerHTML = skeletons;
+
+    // Also show skeleton for recommendations
+    document.getElementById('top-buys').innerHTML = '<div class="skeleton skeleton-text" style="height: 60px;"></div>';
+    document.getElementById('top-sells').innerHTML = '<div class="skeleton skeleton-text" style="height: 60px;"></div>';
+}
+
 // Refresh analysis
 document.getElementById('refresh-btn').addEventListener('click', async () => {
     const btn = document.getElementById('refresh-btn');
@@ -90,6 +121,9 @@ document.getElementById('refresh-btn').addEventListener('click', async () => {
 
     console.log('Starting stock analysis...');
     showToast('Fetching stock data...', 'info', 3000);
+
+    // Show skeleton loaders
+    showSkeletonLoaders();
 
     try {
         const response = await fetch('/api/analyze');
@@ -105,10 +139,28 @@ document.getElementById('refresh-btn').addEventListener('click', async () => {
         } else {
             console.error('Analysis failed:', data.message);
             showToast('Analysis failed: ' + data.message, 'error', 7000);
+            // Clear skeletons on error
+            document.getElementById('stock-cards').innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        ${data.message}
+                    </div>
+                </div>
+            `;
         }
     } catch (error) {
         console.error('Error during analysis:', error);
         showToast('Network error. Please check your connection and try again.', 'error', 7000);
+        // Clear skeletons on error
+        document.getElementById('stock-cards').innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Network error. Please try again.
+                </div>
+            </div>
+        `;
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Refresh Analysis';
@@ -334,8 +386,41 @@ function initializeDarkMode() {
     }
 }
 
+// Auto-load data on startup
+async function autoLoadData() {
+    console.log('Auto-loading stock data on startup...');
+    showSkeletonLoaders();
+
+    try {
+        const response = await fetch('/api/analyze');
+        const data = await response.json();
+
+        if (data.success) {
+            console.log('Auto-load successful!', data);
+            updateDashboard(data);
+        } else {
+            console.error('Auto-load failed:', data.message);
+            document.getElementById('stock-cards').innerHTML = `
+                <div class="col-12">
+                    <p class="text-muted">Click "Refresh Analysis" to load stock data</p>
+                    <small class="text-danger">${data.message}</small>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Auto-load error:', error);
+        document.getElementById('stock-cards').innerHTML = `
+            <div class="col-12">
+                <p class="text-muted">Click "Refresh Analysis" to load stock data</p>
+            </div>
+        `;
+    }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     initializeDarkMode();
     initializeSocket();
+    // Auto-load data after a short delay
+    setTimeout(autoLoadData, 500);
 });

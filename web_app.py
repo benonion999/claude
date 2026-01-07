@@ -140,30 +140,65 @@ def analyze_stocks():
     global latest_analyses
 
     try:
-        stocks = config['stocks']
+        print("Starting stock analysis...")
+        stocks = config.get('stocks', [])
+
+        if not stocks:
+            print("No stocks configured!")
+            return jsonify({
+                'success': False,
+                'message': 'No stocks configured. Please add stocks in settings.'
+            }), 400
+
+        print(f"Analyzing stocks: {stocks}")
         stock_data = fetcher.get_multiple_stocks(stocks, period="3mo")
+        print(f"Fetched data for {len(stock_data)} stocks")
+
+        if not stock_data:
+            print("No stock data returned from fetcher")
+            return jsonify({
+                'success': False,
+                'message': 'Failed to fetch stock data. Please check your internet connection and try again.'
+            }), 500
 
         analyses = []
         for symbol, data in stock_data.items():
             try:
+                print(f"Analyzing {symbol}...")
                 analysis = analyzer.analyze_stock(symbol, data)
                 analyses.append(analysis)
+                print(f"Successfully analyzed {symbol}")
             except Exception as e:
                 print(f"Error analyzing {symbol}: {e}")
+                import traceback
+                traceback.print_exc()
+
+        if not analyses:
+            print("No successful analyses")
+            return jsonify({
+                'success': False,
+                'message': 'Failed to analyze stocks. Please try again.'
+            }), 500
 
         # Generate insights
+        print("Generating portfolio insights...")
         insights = analyzer.get_portfolio_insights(analyses)
 
         # Store latest analyses
         latest_analyses = analyses
 
         # Emit update to all connected clients
-        socketio.emit('analysis_update', {
-            'analyses': analyses,
-            'insights': insights,
-            'timestamp': datetime.now().isoformat()
-        })
+        try:
+            socketio.emit('analysis_update', {
+                'analyses': analyses,
+                'insights': insights,
+                'timestamp': datetime.now().isoformat()
+            })
+            print("Emitted WebSocket update")
+        except Exception as e:
+            print(f"Error emitting WebSocket update: {e}")
 
+        print(f"Analysis complete! Returning {len(analyses)} analyses")
         return jsonify({
             'success': True,
             'analyses': analyses,
@@ -171,6 +206,9 @@ def analyze_stocks():
             'timestamp': datetime.now().isoformat()
         })
     except Exception as e:
+        print(f"Fatal error in analyze_stocks: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
 

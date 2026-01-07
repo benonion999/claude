@@ -3,6 +3,47 @@
 let socket;
 let currentAnalyses = [];
 
+// Toast Notification System
+function showToast(message, type = 'info', duration = 5000) {
+    const toastContainer = document.getElementById('toast-container');
+    const toastId = 'toast-' + Date.now();
+
+    const bgClass = {
+        'success': 'bg-success',
+        'error': 'bg-danger',
+        'warning': 'bg-warning',
+        'info': 'bg-info'
+    }[type] || 'bg-info';
+
+    const icon = {
+        'success': 'bi-check-circle-fill',
+        'error': 'bi-exclamation-circle-fill',
+        'warning': 'bi-exclamation-triangle-fill',
+        'info': 'bi-info-circle-fill'
+    }[type] || 'bi-info-circle-fill';
+
+    const toastHTML = `
+        <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi ${icon} me-2"></i>${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    `;
+
+    toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement, { delay: duration });
+    toast.show();
+
+    // Remove from DOM after hiding
+    toastElement.addEventListener('hidden.bs.toast', () => {
+        toastElement.remove();
+    });
+}
+
 // Initialize Socket.IO connection
 function initializeSocket() {
     socket = io();
@@ -45,21 +86,29 @@ function updateConnectionStatus(connected) {
 document.getElementById('refresh-btn').addEventListener('click', async () => {
     const btn = document.getElementById('refresh-btn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Analyzing...';
+    btn.innerHTML = '<i class="bi bi-arrow-clockwise spinner-border spinner-border-sm"></i> Analyzing...';
+
+    console.log('Starting stock analysis...');
+    showToast('Fetching stock data...', 'info', 3000);
 
     try {
         const response = await fetch('/api/analyze');
+        console.log('Response status:', response.status);
+
         const data = await response.json();
+        console.log('Response data:', data);
 
         if (data.success) {
+            console.log('Analysis successful!', data);
+            showToast(`Successfully analyzed ${data.analyses.length} stocks!`, 'success');
             updateDashboard(data);
         } else {
             console.error('Analysis failed:', data.message);
-            alert('Analysis failed: ' + data.message);
+            showToast('Analysis failed: ' + data.message, 'error', 7000);
         }
     } catch (error) {
         console.error('Error during analysis:', error);
-        alert('Error during analysis. Please try again.');
+        showToast('Network error. Please check your connection and try again.', 'error', 7000);
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Refresh Analysis';
